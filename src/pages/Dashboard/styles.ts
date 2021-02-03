@@ -18,6 +18,8 @@ export const Header = styled.View`
   align-items: center;
 `;
 
+Header.displayName='HeaderDashboard';
+
 export const HeaderTitle = styled.Text`
   color: #f4ede8;
   font-size: 24px;
