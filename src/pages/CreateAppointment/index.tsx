@@ -130,9 +130,10 @@ const CreateAppointment: React.FC = () => {
       await api.post('appointments', {
         provider_id: selectedProvider,
         date
+      }).then(() => {
+        navigate('AppointmentCreated', { date: date.getTime() })
       })
 
-      navigate('AppointmentCreated', { date: date.getTime() })
     } catch(err) {
       Alert.alert(
         'Erro ao criar agendamento',
@@ -228,7 +229,7 @@ const CreateAppointment: React.FC = () => {
         </Section>
       </Schedule>
 
-      <CreateAppointmentButton onPress={() => {handleCreateAppointment}}>
+      <CreateAppointmentButton onPress={handleCreateAppointment}>
           <CreateAppointmentButtonText>Agendar</CreateAppointmentButtonText>
       </CreateAppointmentButton>
       </Content>
