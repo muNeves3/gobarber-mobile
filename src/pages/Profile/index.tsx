@@ -1,4 +1,7 @@
 import React, { useRef, useCallback } from 'react';
+
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+
 import {
   Image,
   View,
@@ -30,7 +33,7 @@ interface IProfileFormData {
 }
 
 const SignUp: React.FC = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, signOut } = useAuth();
 
   const navigation = useNavigation();
   const formRef = useRef<FormHandles>(null);
@@ -40,9 +43,35 @@ const SignUp: React.FC = () => {
   const passwordInputRef = useRef<TextInput>(null);
   const confirmPasswordInputRef = useRef<TextInput>(null);
 
+  const handleUpdateAvatar = useCallback(() => {
+    launchImageLibrary({
+      mediaType: "photo",
+      maxHeight: 186,
+      maxWidth: 186,
+      quality: 0.5
+    }, response => {
+      if(response.didCancel) {
+        return
+      }
+
+      const data = new FormData();
+
+      data.append('avatar', {
+        type: 'image/jpeg',
+        name: `${user.id}.jpg`,
+        uri: response.uri
+      })
+
+       api.patch('users/avatar', data).then(apiResponse => {
+        updateUser(apiResponse.data);
+      });
+
+    })
+  }, [updateUser, user.id]);
+
   const handleGoBack = useCallback(() => {
     navigation.goBack();
-  }, [navigation])
+  }, [navigation, updateUser])
 
   const handleSignUp = useCallback(async (data: IProfileFormData) => {
     try {
@@ -131,7 +160,7 @@ const SignUp: React.FC = () => {
               <Icon name="chevron-left" size={24} color="#999591"/>
             </BackButton>
 
-            <UserAvatarButton onPress={() => {}}>
+            <UserAvatarButton onPress={handleUpdateAvatar}>
               <UserAvatar source={{uri: user.avatar_url}}/>
             </UserAvatarButton>
 
@@ -205,6 +234,10 @@ const SignUp: React.FC = () => {
             <Button onPress={() => formRef.current?.submitForm()}>
               Confirmar mudanças
             </Button>
+
+            {/* <Button onPress={signOut}>
+              Deslogar
+            </Button> */}
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>
